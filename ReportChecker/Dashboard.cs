@@ -70,7 +70,7 @@ namespace ReportChecker
         public void ProcessDashboard(List<string> results)
         {
             
-            Console.WriteLine("Stuff");
+            Console.WriteLine("Test");
         }
  
          public bool FacilityExists(string facilityName)
