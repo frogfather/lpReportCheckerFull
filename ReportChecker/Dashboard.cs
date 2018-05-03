@@ -69,8 +69,18 @@ namespace ReportChecker
  
         public void ProcessDashboard(List<string> results)
         {
+         //start with the last sheet. 
+         //find line 1
+         foreach(string item in results)
+            {
+                string[] parameters = { "\t" };
+                string[] sepResults = item.Split(parameters, StringSplitOptions.None);
+                if (sepResults[0] == "1")
+                {
+                    Console.WriteLine(item);
+                }
+            }
             
-            Console.WriteLine("Test");
         }
  
          public bool FacilityExists(string facilityName)
