@@ -69,15 +69,27 @@ namespace ReportChecker
  
         public void ProcessDashboard(List<string> results)
         {
-         //start with the last sheet. 
-         //find line 1
-         foreach(string item in results)
+            //start with the last sheet. 
+            //find line 1
+            foreach (string item in results)
             {
                 string[] parameters = { "\t" };
                 string[] sepResults = item.Split(parameters, StringSplitOptions.None);
-                if (sepResults[0] == "1")
+                string firstCol = sepResults[0];
+                int sheetID = Convert.ToInt16(firstCol.Substring(2,(firstCol.IndexOf("R:")-2)));
+
+                if (sheetID == 1)
                 {
-                    Console.WriteLine(item);
+                    Console.WriteLine("Summary page "+item);
+                }
+                else if (sheetID > 1 && sheetID < 12)
+                {
+                    //it's one of the server pages and the next line is the headers
+                    Console.WriteLine("Server page " + item);
+                }
+                else if (sheetID == 12)
+                {
+                    Console.WriteLine("Detail page " + item);
                 }
             }
             

@@ -55,7 +55,7 @@ namespace ReportChecker
 
                 for (int row = 1; row <= xRows; row++)
                 {
-                    output += row;
+                    output += "S:"+sheetNo+"R:"+row;
 
                     for (int col = 1; col <= xCols; col++)
                     {
