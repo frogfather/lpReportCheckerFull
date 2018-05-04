@@ -28,9 +28,6 @@ namespace ReportChecker
         {
             string fileName;
             string directoryPath;
-            string excelFileName;
-            string htmlFileName;
-            string fileType;
             DateTime fileDate;
             listBox1.Items.Clear();
             fileName = OpenFile();

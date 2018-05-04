@@ -25,16 +25,20 @@ namespace ReportChecker
 
         public void AddScript(string scriptName)
         {
-            scripts.Add(new Script(scriptName));
-            GetScript(scriptName).MatchChanged += ReportFailChange;
+            if (!ScriptExists(scriptName))
+            {
+                scripts.Add(new Script(scriptName));
+                GetScript(scriptName).MatchChanged += ReportFailChange;
+            }
         }
 
-        public Script GetScript(string scriptName)
+        private bool ScriptExists(string scriptName)
         {
-            if (scripts.Find(x => x.Name == scriptName) == null) { AddScript(scriptName); }
+            return scripts.Find(x => x.Name == scriptName) != null;
+        }
+        public Script GetScript(string scriptName)
+        {            
             return scripts.Find(x => x.Name == scriptName);
-
-
         }
         //to add check dash success total == email success total, check dash fail total == email fail total, check dash success codes == email success codes, check dash fail codes == email fail codes, check error messages for ISM errors
         public string Name { get; set; }

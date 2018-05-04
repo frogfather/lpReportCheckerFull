@@ -46,7 +46,7 @@ namespace ReportChecker
         public void ReadExcel()
         {
 
-            for (int sheetNo = 1; sheetNo <= xlWorkbook.Sheets.Count; sheetNo++)
+            for (int sheetNo = xlWorkbook.Sheets.Count ; sheetNo >= 1; sheetNo--)
             {
                 SetPage(sheetNo);
                 int xRows = xlRange.Rows.Count;

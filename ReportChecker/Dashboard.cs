@@ -23,10 +23,7 @@ namespace ReportChecker
             string errMsg = "";
             string scriptName = "";
             //first we need to add the facility 
-            if (!FacilityExists(facilityName)) 
-             { 
-                 AddFacility(facilityName); 
-             } 
+            AddFacility(facilityName);             
              //now we need to find the script names 
              foreach(string result in results) 
              {
@@ -71,30 +68,96 @@ namespace ReportChecker
         {
             //start with the last sheet. 
             //find line 1
-            foreach (string item in results)
-            {
-                string[] parameters = { "\t" };
-                string[] sepResults = item.Split(parameters, StringSplitOptions.None);
-                string firstCol = sepResults[0];
-                int sheetID = Convert.ToInt16(firstCol.Substring(2,(firstCol.IndexOf("R:")-2)));
+            string[] headers = { };
+            string[] sepResults;
+            string[] parameters = { "\t" };
+            string currentFacilityName = "";
+            int currentServer = 0;
+            bool detail = false;
+            bool summary = false;
+            bool itemsToCheck = false;
 
-                if (sheetID == 1)
+            foreach (string item in results)
+            {                    
+                sepResults = item.Split(parameters, StringSplitOptions.None);
+                //is this enough of a check? Can check page no too.
+                if (sepResults[1] == "Server" || sepResults[1] == "Name" || sepResults[1] == "PAS / HCIS")
                 {
-                    Console.WriteLine("Summary page "+item);
+                    headers = item.Split(parameters, StringSplitOptions.None);
+                    detail = sepResults[1] == "Server";
+                    summary = sepResults[1] == "PAS / HCIS";
                 }
-                else if (sheetID > 1 && sheetID < 12)
+                else
                 {
-                    //it's one of the server pages and the next line is the headers
-                    Console.WriteLine("Server page " + item);
+                    //process the records depending on whether they're detail, summary or server page
+                    if (detail)
+                    {                                                                                                                        
+                        string facilityName = GetDataFromColumn(headers, sepResults, "Name");
+                        string scriptName = GetDataFromColumn(headers, sepResults, "Script Name");
+                        
+                        if (GetDataFromColumn(headers, sepResults, "Server")!="")
+                        {
+                            currentServer = Convert.ToInt16(GetDataFromColumn(headers, sepResults, "Server"));
+                        }
+                        if ( facilityName != "")
+                        {
+                            itemsToCheck = GetDataFromColumn(headers, sepResults, "Record Count") != "0";
+
+                            //add the facility if it's not there
+                            if (itemsToCheck)
+                            {
+                                currentFacilityName = facilityName;
+                                AddFacility(facilityName);
+                                GetFacility(facilityName).RecCount = Convert.ToInt16(GetDataFromColumn(headers, sepResults, "Record Count"));
+                                GetFacility(facilityName).SuccessCount = Convert.ToInt16(GetDataFromColumn(headers, sepResults, "Success Count"));
+                                GetFacility(facilityName).FailCount = Convert.ToInt16(GetDataFromColumn(headers, sepResults, "Failure Count"));
+                                GetFacility(facilityName).Server = currentServer;
+                            }
+                        }
+                        else if (itemsToCheck && GetDataFromColumn(headers, sepResults, "Script Name") != "Scripting")
+                            {
+                                //add scripts
+                                GetFacility(currentFacilityName).GetScript(scriptName);
+                                string successCodes = GetDataFromColumn(headers, sepResults, "Success Service Codes");
+                                string failCodes = GetDataFromColumn(headers, sepResults, "Failure Service Codes");
+
+                                if (successCodes != "")
+                                {
+                                    //add success codes. Should be a way to merge the arrays?
+                                }
+                                if (failCodes != "")
+                                {
+                                    //add fail codes.
+                                }
+                            }
+                        
+                        
+                    }
+                    else if (summary)
+                    {
+
+                    }
+                    else
+                    {
+                        //server summary
+                    }
                 }
-                else if (sheetID == 12)
-                {
-                    Console.WriteLine("Detail page " + item);
-                }
+                
+                
+
             }
             
         }
  
+        public string GetDataFromColumn(string[] header, string[] data, string heading)
+        {
+            int index = Array.FindIndex(header, x => x == heading);
+            if (index == -1) { return "";}
+            return data[index];
+                
+            
+        }
+            
          public bool FacilityExists(string facilityName)
          { 
              return facilities.Find(x => x.Name == facilityName) != null; 
@@ -103,7 +166,11 @@ namespace ReportChecker
  
          public void AddFacility(string facilityName)
          { 
-             facilities.Add(new Facility(facilityName)); 
+            if (!FacilityExists(facilityName))
+            {
+                facilities.Add(new Facility(facilityName));
+            }
+             
          } 
  
  
