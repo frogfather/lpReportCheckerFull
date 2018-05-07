@@ -38,6 +38,10 @@ namespace ReportChecker
         }
         public Script GetScript(string scriptName)
         {            
+            if (!ScriptExists(scriptName))
+            {
+                AddScript(scriptName);
+            }
             return scripts.Find(x => x.Name == scriptName);
         }
         //to add check dash success total == email success total, check dash fail total == email fail total, check dash success codes == email success codes, check dash fail codes == email fail codes, check error messages for ISM errors

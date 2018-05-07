@@ -55,14 +55,13 @@ namespace ReportChecker
 
                 for (int row = 1; row <= xRows; row++)
                 {
-                    output += "S:"+sheetNo+"R:"+row;
+                    output += GetSheetName(xlWorkbook.Sheets[sheetNo]);                    
 
                     for (int col = 1; col <= xCols; col++)
                     {
-                        output += "\t" + GetCell(row, col); ;                        
+                        string cellContents = GetCell(row, col);
+                        output += "\t" + cellContents; 
                     }
-                    //the below is just for checking. We'll eventually use the output to populate the objects
-                    //listBox1.Items.Add(output);
                     AddResults(output);
                     output = "";
                 }
@@ -97,6 +96,11 @@ namespace ReportChecker
             }
                 
 
+        }
+
+        private string GetSheetName(Excel._Worksheet sheet)
+        {
+            return sheet.Name;
         }
 
         ~ExcelReader()

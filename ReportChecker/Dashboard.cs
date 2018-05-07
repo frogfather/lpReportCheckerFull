@@ -71,6 +71,7 @@ namespace ReportChecker
             string[] headers = { };
             string[] sepResults;
             string[] parameters = { "\t" };
+            string[] commaSplit = { "," };
             string currentFacilityName = "";
             int currentServer = 0;
             bool detail = false;
@@ -121,15 +122,34 @@ namespace ReportChecker
                                 string successCodes = GetDataFromColumn(headers, sepResults, "Success Service Codes");
                                 string failCodes = GetDataFromColumn(headers, sepResults, "Failure Service Codes");
 
-                                if (successCodes != "")
-                                {
-                                    //add success codes. Should be a way to merge the arrays?
+
+                            if (successCodes != "[]")
+                            {
+                                string cleanSuccessCodes = successCodes.Replace("\"", "");
+                                cleanSuccessCodes = cleanSuccessCodes.Replace("[", "");
+                                cleanSuccessCodes = cleanSuccessCodes.Replace("]", "");
+                                string[] sepSuccessCodes = cleanSuccessCodes.Split(commaSplit, StringSplitOptions.RemoveEmptyEntries);
+                                foreach (string entry in sepSuccessCodes)
+                                {                                  
+                                    GetFacility(currentFacilityName).GetScript(scriptName).AddDashSuccess(entry);
                                 }
-                                if (failCodes != "")
-                                {
-                                    //add fail codes.
-                                }
+                                                                    
                             }
+
+                            if (failCodes != "[]")
+                            {
+                                string cleanFailCodes = failCodes.Replace("\"", "");
+                                cleanFailCodes = cleanFailCodes.Replace("[", "");
+                                cleanFailCodes = cleanFailCodes.Replace("]", "");
+                                string[] sepFailCodes = cleanFailCodes.Split(commaSplit, StringSplitOptions.RemoveEmptyEntries);
+                                foreach (string entry in sepFailCodes)
+                                {                                 
+                                    GetFacility(currentFacilityName).GetScript(scriptName).AddDashFail(entry);
+                                }
+
+                                //add fail codes.
+                            }
+                        }
                         
                         
                     }
@@ -176,6 +196,10 @@ namespace ReportChecker
  
          public Facility GetFacility(string facilityName)
          { 
+            if (!FacilityExists(facilityName))
+            {
+                AddFacility(facilityName);
+            }
              return facilities.Find(x => x.Name == facilityName);     
          } 
  
