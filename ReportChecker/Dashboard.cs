@@ -72,8 +72,9 @@ namespace ReportChecker
             string[] sepResults;
             string[] parameters = { "\t" };
             string[] commaSplit = { "," };
+            char[] trimParams = { '[', ']' };
             string currentFacilityName = "";
-            int currentServer = 0;
+            string currentServer = "";
             bool detail = false;
             bool summary = false;
             bool itemsToCheck = false;
@@ -85,8 +86,8 @@ namespace ReportChecker
                 if (sepResults[1] == "Server" || sepResults[1] == "Name" || sepResults[1] == "PAS / HCIS")
                 {
                     headers = item.Split(parameters, StringSplitOptions.None);
-                    detail = sepResults[1] == "Server";
-                    summary = sepResults[1] == "PAS / HCIS";
+                    detail = sepResults[0] == "Detail";
+                    summary = sepResults[0] == "Detail";
                 }
                 else
                 {
@@ -98,7 +99,7 @@ namespace ReportChecker
                         
                         if (GetDataFromColumn(headers, sepResults, "Server")!="")
                         {
-                            currentServer = Convert.ToInt16(GetDataFromColumn(headers, sepResults, "Server"));
+                            currentServer = GetDataFromColumn(headers, sepResults, "Server");
                         }
                         if ( facilityName != "")
                         {
@@ -116,19 +117,29 @@ namespace ReportChecker
                             }
                         }
                         else if (itemsToCheck && GetDataFromColumn(headers, sepResults, "Script Name") != "Scripting")
+                        {
+                            //add scripts
+                            GetFacility(currentFacilityName).GetScript(scriptName);
+                            try
                             {
-                                //add scripts
-                                GetFacility(currentFacilityName).GetScript(scriptName);
-                                string successCodes = GetDataFromColumn(headers, sepResults, "Success Service Codes");
-                                string failCodes = GetDataFromColumn(headers, sepResults, "Failure Service Codes");
+                                GetFacility(currentFacilityName).GetScript(scriptName).RecCount += Convert.ToInt16(GetDataFromColumn(headers, sepResults, "Record Count"));
+                                GetFacility(currentFacilityName).GetScript(scriptName).SuccessCount += Convert.ToInt16(GetDataFromColumn(headers, sepResults, "Success Count"));
+                                GetFacility(currentFacilityName).GetScript(scriptName).FailCount += Convert.ToInt16(GetDataFromColumn(headers, sepResults, "Failure Count"));
+                            }
+                            catch (FormatException e)
+                            {
+                                //these columns should have a value. if they don't - poss script fail
+                                GetFacility(currentFacilityName).GetScript(scriptName).ScriptError = true;
+                                Console.WriteLine("Exception in " + currentFacilityName + " script " + scriptName);
+                            }
 
+                            string successCodes = GetDataFromColumn(headers, sepResults, "Success Service Codes");
+                            string failCodes = GetDataFromColumn(headers, sepResults, "Failure Service Codes");
 
                             if (successCodes != "[]")
                             {
-                                string cleanSuccessCodes = successCodes.Replace("\"", "");
-                                cleanSuccessCodes = cleanSuccessCodes.Replace("[", "");
-                                cleanSuccessCodes = cleanSuccessCodes.Replace("]", "");
-                                string[] sepSuccessCodes = cleanSuccessCodes.Split(commaSplit, StringSplitOptions.RemoveEmptyEntries);
+                                successCodes = successCodes.Trim(trimParams).Replace("\"", "");                                              
+                                string[] sepSuccessCodes = successCodes.Split(commaSplit, StringSplitOptions.RemoveEmptyEntries);
                                 foreach (string entry in sepSuccessCodes)
                                 {                                  
                                     GetFacility(currentFacilityName).GetScript(scriptName).AddDashSuccess(entry);
@@ -138,16 +149,12 @@ namespace ReportChecker
 
                             if (failCodes != "[]")
                             {
-                                string cleanFailCodes = failCodes.Replace("\"", "");
-                                cleanFailCodes = cleanFailCodes.Replace("[", "");
-                                cleanFailCodes = cleanFailCodes.Replace("]", "");
-                                string[] sepFailCodes = cleanFailCodes.Split(commaSplit, StringSplitOptions.RemoveEmptyEntries);
+                                failCodes = failCodes.Trim(trimParams).Replace("\"", "");
+                                string[] sepFailCodes = failCodes.Split(commaSplit, StringSplitOptions.RemoveEmptyEntries);
                                 foreach (string entry in sepFailCodes)
                                 {                                 
                                     GetFacility(currentFacilityName).GetScript(scriptName).AddDashFail(entry);
-                                }
-
-                                //add fail codes.
+                                }                                
                             }
                         }
                         
@@ -206,8 +213,8 @@ namespace ReportChecker
  
 
  
-         List<Facility> facilities;     
-
+         List<Facility> facilities;
+        
 
     }
 

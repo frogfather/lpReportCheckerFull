@@ -69,7 +69,7 @@ namespace ReportChecker
                         
                     }
 
-
+                    listBox1.Items.Add("");
 
                 }                
 

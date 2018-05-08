@@ -16,6 +16,7 @@ namespace ReportChecker
             _dashFail = new List<string>();
             _emailSuccess = new List<string>();
             _emailFail = new Dictionary<string, string>();
+            ScriptError = false;
         }
 
         public string Name { get; set; }
@@ -25,6 +26,7 @@ namespace ReportChecker
         public bool ISMError { get; set; }
         public bool SuccessCountMatch { get; set; }
         public bool FailCountMatch { get; set; }
+        public bool ScriptError { get; set; }
 
         public int RecCount
         {  

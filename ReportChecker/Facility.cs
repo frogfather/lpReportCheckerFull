@@ -46,7 +46,7 @@ namespace ReportChecker
         }
         //to add check dash success total == email success total, check dash fail total == email fail total, check dash success codes == email success codes, check dash fail codes == email fail codes, check error messages for ISM errors
         public string Name { get; set; }
-        public int Server { get; set; }
+        public string Server { get; set; }
 
         public int Coid { get; set; }
 
