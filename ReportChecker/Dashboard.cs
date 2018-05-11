@@ -10,8 +10,23 @@ namespace ReportChecker
         public Dashboard()
         {
             facilities = new List<Facility>();
+            emailToDash = new Dictionary<string, string>();
+            SetUpEmailToDash();
+            DashFailMatch = true;
+            DashSuccessMatch = true;
+            DashISMError = false;
         }
 
+        private void SetUpEmailToDash()
+        {
+            emailToDash.Clear();                                                           
+            emailToDash.Add("Memorial Medical Center - Las Cruces", "Memorial Medical Center Of Las Cruces");                                    
+            emailToDash.Add("SageWest Health Care - Lander Campus", "SageWest Health Care - Lander");                        
+            emailToDash.Add("Starr Regional Medical Center - Athens", "Starr Regional Medical Center - Athens campus");                                               
+            emailToDash.Add("Fleming County Hospital District", "Fleming County Hospital");                                              
+            emailToDash.Add("Danville Regional Medical", "Danville Regional Medical Center");                                                                      
+            emailToDash.Add("Vaughan Regional Medical Center", "Vaughan Regional Medical Center Parkway Campus");
+        }
 
 
         public void ProcessEmails(List<string> results, string facilityName, bool success)
@@ -23,6 +38,7 @@ namespace ReportChecker
             string errMsg = "";
             string scriptName = "";
             //first we need to add the facility 
+            facilityName = TranslateIfNecessary(facilityName);
             AddFacility(facilityName);             
              //now we need to find the script names 
              foreach(string result in results) 
@@ -33,7 +49,7 @@ namespace ReportChecker
                 if (result.Contains("Script Name:"))
                  {
                     //extract the script name
-                    scriptName = result.Substring(result.LastIndexOf(":") + 1); //use the split item instead
+                    scriptName = result.Substring(result.LastIndexOf(":") + 1).Trim(); 
                     GetFacility(facilityName).AddScript(scriptName);
                  }
                  else if (result.Contains("Service Code")) 
@@ -108,7 +124,7 @@ namespace ReportChecker
                             //add the facility if it's not there
                             if (itemsToCheck)
                             {
-                                currentFacilityName = facilityName;
+                                currentFacilityName = facilityName; //change to currentFacilityName
                                 AddFacility(facilityName);
                                 GetFacility(facilityName).RecCount = Convert.ToInt16(GetDataFromColumn(headers, sepResults, "Record Count"));
                                 GetFacility(facilityName).SuccessCount = Convert.ToInt16(GetDataFromColumn(headers, sepResults, "Success Count"));
@@ -129,8 +145,17 @@ namespace ReportChecker
                             catch (FormatException e)
                             {
                                 //these columns should have a value. if they don't - poss script fail
-                                GetFacility(currentFacilityName).GetScript(scriptName).ScriptError = true;
-                                Console.WriteLine("Exception in " + currentFacilityName + " script " + scriptName);
+                                if (scriptName != "")
+                                {
+                                    GetFacility(currentFacilityName).GetScript(scriptName).ScriptError = true;
+                                    Console.WriteLine("Exception in " + currentFacilityName + " script " + scriptName);
+                                }
+                                else
+                                {
+                                    GetFacility(currentFacilityName).FacilityScriptError = true;
+                                    Console.WriteLine("Exception in " + currentFacilityName + " unknown script ");
+                                }
+                                
                             }
 
                             string successCodes = GetDataFromColumn(headers, sepResults, "Success Service Codes");
@@ -176,6 +201,19 @@ namespace ReportChecker
             
         }
  
+        private string TranslateIfNecessary(string key)
+        {
+            key = key.Trim();
+            if (emailToDash.ContainsKey(key))
+            {
+                return emailToDash[key];
+            }
+            else
+            {
+                return key;
+            }
+        }
+
         public string GetDataFromColumn(string[] header, string[] data, string heading)
         {
             int index = Array.FindIndex(header, x => x == heading);
@@ -196,10 +234,24 @@ namespace ReportChecker
             if (!FacilityExists(facilityName))
             {
                 facilities.Add(new Facility(facilityName));
+                Console.WriteLine("Adding facility " + facilityName);
+                Console.WriteLine("Facility count is now " + GetFacilityCount());
+                GetFacility(facilityName).FacFlagsChanged += ReportFacFlagsChanged;
             }
              
          } 
  
+        public Facility GetFacility(int index)
+        {
+            if (index >= 0 && index < facilities.Count)
+            {
+                return facilities[index];
+            }
+            else
+            {
+                return null;
+            }
+        }
  
          public Facility GetFacility(string facilityName)
          { 
@@ -210,12 +262,141 @@ namespace ReportChecker
              return facilities.Find(x => x.Name == facilityName);     
          } 
  
+        public int GetFacilityCount()
+        {
+            return facilities.Count;
+        }
  
+        private void ReportFacFlagsChanged(object sender, MatchEventArgs args)
+        {
+            //need to check all facility flags
+            bool dashFailMatch = true;
+            bool dashSuccMatch = true;
+            bool dashISMError = false;
+            bool dashScriptError = false;
 
- 
-         List<Facility> facilities;
-        
+            foreach (Facility facility in facilities)
+            {
+                if (facility.FacilitySuccessMatch == false) { dashSuccMatch = false; }
+                if (facility.FacilityFailMatch == false) { dashFailMatch = false; }
+                if (facility.FacilityISMError == true) { dashISMError = true; }
+                if (facility.FacilityScriptError == true) { dashScriptError = true; }
 
+
+            }
+            DashFailMatch = dashFailMatch;
+            DashSuccessMatch = dashSuccMatch;
+            DashISMError = dashISMError;
+            DashScriptError = dashScriptError;
+
+            Console.WriteLine("Facility " + args.CalledBy + " dash success match: " + dashSuccMatch);
+            Console.WriteLine("Facility " + args.CalledBy + " dash fail match: " + dashFailMatch);
+            Console.WriteLine("Facility " + args.CalledBy + " dash ISM Error: " + dashISMError);
+            Console.WriteLine("Facility " + args.CalledBy + " dash Script Error: " + dashScriptError);
+        }
+
+        public bool DashFailMatch
+        {
+            get
+            {
+                return _dashFailMatch;
+            }
+            set
+            {
+                if (_dashFailMatch != value)
+                {
+                    _dashFailMatch = value;
+
+                    MatchEventArgs eArgs = new MatchEventArgs()
+                    {
+                        Value = _dashFailMatch,
+                        CalledBy = " Dashboard fail match"
+                    };
+                    DashFlagsChanged?.Invoke(this, eArgs);
+                }
+
+            }
+        }
+
+        public bool DashSuccessMatch
+        {
+            get
+            {
+                return _dashSuccMatch;
+            }
+            set
+            {
+                if (_dashSuccMatch != value)
+                {
+                    _dashSuccMatch = value;
+                    MatchEventArgs eArgs = new MatchEventArgs()
+                    {
+                        Value = _dashSuccMatch,
+                        CalledBy = " Dashboard success match"
+                    };
+                    DashFlagsChanged?.Invoke(this, eArgs);
+
+                }
+
+            }
+        }
+
+        public bool DashISMError
+        {
+            get
+            {
+                return _dashISMError;
+            }
+            set
+            {
+                if (_dashISMError != value)
+                {
+                    _dashISMError = value;
+                    MatchEventArgs eArgs = new MatchEventArgs()
+                    {
+                        Value = _dashISMError,
+                        CalledBy = " Dashboard ISM error"
+                    };
+                    DashFlagsChanged?.Invoke(this, eArgs);
+
+                }
+
+            }
+        }
+
+        public bool DashScriptError
+        {
+            get
+            {
+                return _dashScriptError;
+            }
+            set
+            {
+                if (_dashScriptError != value)
+                {
+                    _dashScriptError = value;
+                    MatchEventArgs eArgs = new MatchEventArgs()
+                    {
+                        Value = _dashScriptError,
+                        CalledBy = " Dashboard Script error"
+                    };
+                    DashFlagsChanged?.Invoke(this, eArgs);
+
+                }
+
+            }
+        }
+
+
+
+        List<Facility> facilities;
+        Dictionary<string, string> emailToDash;
+
+        bool _dashFailMatch;
+        bool _dashSuccMatch;
+        bool _dashISMError;
+        bool _dashScriptError;
+        public event MatchChangedDelegate DashFlagsChanged;
     }
 
 }

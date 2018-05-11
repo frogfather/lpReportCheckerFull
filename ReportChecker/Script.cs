@@ -17,6 +17,9 @@ namespace ReportChecker
             _emailSuccess = new List<string>();
             _emailFail = new Dictionary<string, string>();
             ScriptError = false;
+            ISMError = false;
+            SuccessCountMatch = true;
+            FailCountMatch = true;
         }
 
         public string Name { get; set; }
@@ -42,7 +45,7 @@ namespace ReportChecker
                      { 
                          OldValue = _recCount.ToString(), 
                          NewValue = value.ToString(), 
-                         CalledBy = "Record Count" 
+                         CalledBy = Name + " Record Count" 
                      }; 
                      if (ValueChanged != null) 
                     { 
@@ -67,7 +70,7 @@ namespace ReportChecker
                      { 
                          OldValue = _successCount.ToString(), 
                          NewValue = value.ToString(), 
-                         CalledBy = "Success Count" 
+                         CalledBy = Name + " Success Count" 
                      }; 
  
  
@@ -94,7 +97,7 @@ namespace ReportChecker
                      { 
                          OldValue = _failCount.ToString(), 
                          NewValue = value.ToString(), 
-                         CalledBy = "Fail count" 
+                         CalledBy = Name + "Fail count" 
                      }; 
                      ValueChanged?.Invoke(this, args); 
                      _failCount = value; 
@@ -114,7 +117,7 @@ namespace ReportChecker
                  { 
                      OldValue = _emailSuccess.Count.ToString(), 
                      NewValue = (_emailSuccess.Count + 1).ToString(), 
-                     CalledBy = "Email success codes" 
+                     CalledBy = Name + " Email success codes" 
                  }; 
                  ValueChanged?.Invoke(this, args); 
                  _emailSuccess.Add(serviceCode); 
@@ -152,7 +155,7 @@ namespace ReportChecker
                  { 
                      OldValue = _emailFail.Count.ToString(), 
                      NewValue = (_emailFail.Count + 1).ToString(), 
-                     CalledBy = "Email fail codes" 
+                     CalledBy = Name + " Email fail codes" 
                  }; 
                  ValueChanged?.Invoke(this, args); 
  
@@ -188,7 +191,7 @@ namespace ReportChecker
              { 
                  OldValue = _dashSuccess.Count.ToString(), 
                  NewValue = (_dashSuccess.Count + 1).ToString(), 
-                 CalledBy = "Dashboard success codes" 
+                 CalledBy = Name + " Dashboard success codes" 
              }; 
                  ValueChanged?.Invoke(this, args); 
  
@@ -224,7 +227,7 @@ namespace ReportChecker
              { 
                  OldValue = _dashFail.Count.ToString(), 
                  NewValue = (_dashFail.Count + 1).ToString(), 
-                 CalledBy = "Dashboard fail codes" 
+                 CalledBy = Name + " Dashboard fail codes" 
              }; 
                  ValueChanged?.Invoke(this, args); 
  

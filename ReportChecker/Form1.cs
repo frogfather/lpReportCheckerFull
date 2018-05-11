@@ -17,11 +17,16 @@ namespace ReportChecker
         {
             InitializeComponent();
             mainDashboard = new Dashboard();
+            mainDashboard.DashFlagsChanged += ReportDashFlags;
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
 
+        }
+
+        private void ReportDashFlags(object sender, MatchEventArgs args)
+        {
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -69,7 +74,7 @@ namespace ReportChecker
                         
                     }
 
-                    listBox1.Items.Add("");
+                    CheckAllFlags();
 
                 }                
 
@@ -77,6 +82,32 @@ namespace ReportChecker
             
         }
 
+        private void CheckAllFlags()
+        {
+            //should poll all facilities here
+            int facilityCount = mainDashboard.GetFacilityCount();
+            for (int i = 0; i < facilityCount; i++)
+            {
+                if (mainDashboard.GetFacility(i).FacilitySuccessMatch == false)
+                {
+                    listBox1.Items.Add("Facility " + mainDashboard.GetFacility(i).Name + " Success emails do not match dashboard");
+                }
+                if (mainDashboard.GetFacility(i).FacilityFailMatch == false)
+                {
+                    listBox1.Items.Add("Facility " + mainDashboard.GetFacility(i).Name + " Failure emails do not match dashboard");
+                }
+                if (mainDashboard.GetFacility(i).FacilityISMError == true)
+                {
+                    listBox1.Items.Add("Facility " + mainDashboard.GetFacility(i).Name + " ISM error at this facility");
+                }
+                if (mainDashboard.GetFacility(i).FacilityScriptError == true)
+                {
+                    listBox1.Items.Add("Facility " + mainDashboard.GetFacility(i).Name + " Script error at this facility");
+                }
+                
+
+            }
+        }
         private string OpenFile()
         {
             OpenFileDialog fileDialog = new OpenFileDialog();
