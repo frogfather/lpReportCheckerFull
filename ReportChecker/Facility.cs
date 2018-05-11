@@ -66,8 +66,19 @@ namespace ReportChecker
             }
             return scripts.Find(x => x.Name == scriptName);
         }
+        public Script GetScript(int index)
+        {
+            if (index >= 0 && index < scripts.Count)
+            {
+                return scripts[index];            
+            }
+            else
+            {
+                return null;
+            }
+        }
 
-        private int GetScriptCount()
+        public int GetScriptCount()
         {
             return scripts.Count;
         }

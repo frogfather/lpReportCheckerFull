@@ -75,6 +75,7 @@ namespace ReportChecker
                     }
 
                     CheckAllFlags();
+                    GenerateTreeResults();
 
                 }                
 
@@ -108,6 +109,37 @@ namespace ReportChecker
 
             }
         }
+
+        private void GenerateTreeResults()
+        {
+            tvResults.Nodes.Clear();
+            int facilityCount = mainDashboard.GetFacilityCount();
+            for (int facNo = 0; facNo < facilityCount; facNo ++)
+            {
+                //generate array of scripts
+                int scriptCount = mainDashboard.GetFacility(facNo).GetScriptCount();
+                TreeNode[] array = new TreeNode[scriptCount];                
+                for (int scriptNo = 0; scriptNo < scriptCount; scriptNo ++)
+                {
+                    array[scriptNo] = new TreeNode(mainDashboard.GetFacility(facNo).GetScript(scriptNo).Name);                    //these icons will be different eventually
+                    if (mainDashboard.GetFacility(facNo).GetScript(scriptNo).ISMError == true) { array[scriptNo].ImageIndex = 1; }
+                    if (mainDashboard.GetFacility(facNo).GetScript(scriptNo).ScriptError == true) { array[scriptNo].ImageIndex = 1; }
+                    if (mainDashboard.GetFacility(facNo).GetScript(scriptNo).FailCountMatch == false) { array[scriptNo].ImageIndex = 1; }
+                    if (mainDashboard.GetFacility(facNo).GetScript(scriptNo).SuccessCountMatch == false) { array[scriptNo].ImageIndex = 1; }
+                    array[scriptNo].SelectedImageIndex = array[scriptNo].ImageIndex;
+                }
+
+                TreeNode treeNode = new TreeNode(mainDashboard.GetFacility(facNo).Name,array); 
+                if (mainDashboard.GetFacility(facNo).FacilityISMError == true) { treeNode.ImageIndex = 1; }
+                if (mainDashboard.GetFacility(facNo).FacilityScriptError == true) { treeNode.ImageIndex = 1; }
+                if (mainDashboard.GetFacility(facNo).FacilityFailMatch == false) { treeNode.ImageIndex = 1; }
+                if (mainDashboard.GetFacility(facNo).FacilitySuccessMatch == false) { treeNode.ImageIndex = 1; }
+                treeNode.SelectedImageIndex = treeNode.ImageIndex;
+                tvResults.Nodes.Add(treeNode);
+
+            }
+        }
+
         private string OpenFile()
         {
             OpenFileDialog fileDialog = new OpenFileDialog();
@@ -157,5 +189,9 @@ namespace ReportChecker
 
         Dashboard mainDashboard;
 
+        private void tvResults_MouseClick(object sender, MouseEventArgs e)
+        {
+            
+        }
     }
 }
