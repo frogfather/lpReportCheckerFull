@@ -54,7 +54,7 @@ namespace ReportChecker
                         //compare its date to the selected file date. Ignore files that aren't either .html or .xlsx
                         if (fileInfo.LastWriteTime.Date != fileDate.Date || fileInfo.Attributes.HasFlag(FileAttributes.Hidden)) 
                         {
-                            listBox1.Items.Add("File " + fileInfo.Name + " out of date: " + fileInfo.LastWriteTime);
+                            //listBox1.Items.Add("File " + fileInfo.Name + " out of date: " + fileInfo.LastWriteTime); maybe move it to an 'old files folder?
                         }
                         else
                         {
@@ -118,18 +118,56 @@ namespace ReportChecker
             {
                 //generate array of scripts
                 int scriptCount = mainDashboard.GetFacility(facNo).GetScriptCount();
-                TreeNode[] array = new TreeNode[scriptCount];                
+                TreeNode[] scriptArray = new TreeNode[scriptCount];
+                TreeNode[] resultArray;
                 for (int scriptNo = 0; scriptNo < scriptCount; scriptNo ++)
                 {
-                    array[scriptNo] = new TreeNode(mainDashboard.GetFacility(facNo).GetScript(scriptNo).Name);                    //these icons will be different eventually
-                    if (mainDashboard.GetFacility(facNo).GetScript(scriptNo).ISMError == true) { array[scriptNo].ImageIndex = 1; }
-                    if (mainDashboard.GetFacility(facNo).GetScript(scriptNo).ScriptError == true) { array[scriptNo].ImageIndex = 1; }
-                    if (mainDashboard.GetFacility(facNo).GetScript(scriptNo).FailCountMatch == false) { array[scriptNo].ImageIndex = 1; }
-                    if (mainDashboard.GetFacility(facNo).GetScript(scriptNo).SuccessCountMatch == false) { array[scriptNo].ImageIndex = 1; }
-                    array[scriptNo].SelectedImageIndex = array[scriptNo].ImageIndex;
+                    //for each script we need a list of success email codes, success dash codes, fail email codes, fail dash codes
+                    //we have a node for success and fail if there are any results
+                    int resultTypeCount = 0; 
+                    if (mainDashboard.GetFacility(facNo).GetScript(scriptNo).GetDashSuccessCount() > 0 || mainDashboard.GetFacility(facNo).GetScript(scriptNo).GetEmailSuccessCount() > 0) { resultTypeCount += 1; }
+                    if (mainDashboard.GetFacility(facNo).GetScript(scriptNo).GetDashFailCount() > 0 || mainDashboard.GetFacility(facNo).GetScript(scriptNo).GetEmailFailCount() > 0) { resultTypeCount += 1; }
+                    
+                    if (resultTypeCount > 0)
+                    {
+                        resultArray = new TreeNode[resultTypeCount];
+                        if (mainDashboard.GetFacility(facNo).GetScript(scriptNo).GetEmailSuccessCount() > 0 || mainDashboard.GetFacility(facNo).GetScript(scriptNo).GetDashSuccessCount() > 0)
+                        {
+                            resultArray[0] = new TreeNode("Success codes");
+                            if (mainDashboard.GetFacility(facNo).GetScript(scriptNo).SuccessCountMatch == false) { resultArray[0].ImageIndex = 1; }
+                            resultArray[0].SelectedImageIndex = resultArray[0].ImageIndex;
+                        }
+                        if (mainDashboard.GetFacility(facNo).GetScript(scriptNo).GetEmailFailCount() > 0 || mainDashboard.GetFacility(facNo).GetScript(scriptNo).GetDashFailCount() > 0)
+                        {
+                            if (resultTypeCount == 2)
+                            {
+                                resultArray[1] = new TreeNode("Fail codes");
+                                if (mainDashboard.GetFacility(facNo).GetScript(scriptNo).FailCountMatch == false) { resultArray[1].ImageIndex = 1; }
+                                resultArray[1].SelectedImageIndex = resultArray[1].ImageIndex;
+                            }
+                            else
+                            {
+                                resultArray[0] = new TreeNode("Fail codes");
+                                if (mainDashboard.GetFacility(facNo).GetScript(scriptNo).FailCountMatch == false) { resultArray[0].ImageIndex = 1; }
+                            }
+                        }
+
+                    }
+                    else
+                    {
+                        resultArray = new TreeNode[1];
+                        resultArray[0] = new TreeNode("No charge codes posted");
+                    }
+
+                    scriptArray[scriptNo] = new TreeNode(mainDashboard.GetFacility(facNo).GetScript(scriptNo).Name,resultArray);                    
+                    if (mainDashboard.GetFacility(facNo).GetScript(scriptNo).ISMError == true) { scriptArray[scriptNo].ImageIndex = 1; }
+                    if (mainDashboard.GetFacility(facNo).GetScript(scriptNo).ScriptError == true) { scriptArray[scriptNo].ImageIndex = 1; }
+                    if (mainDashboard.GetFacility(facNo).GetScript(scriptNo).FailCountMatch == false) { scriptArray[scriptNo].ImageIndex = 1; }
+                    if (mainDashboard.GetFacility(facNo).GetScript(scriptNo).SuccessCountMatch == false) { scriptArray[scriptNo].ImageIndex = 1; }
+                    scriptArray[scriptNo].SelectedImageIndex = scriptArray[scriptNo].ImageIndex;
                 }
 
-                TreeNode treeNode = new TreeNode(mainDashboard.GetFacility(facNo).Name,array); 
+                TreeNode treeNode = new TreeNode(mainDashboard.GetFacility(facNo).Name, scriptArray); 
                 if (mainDashboard.GetFacility(facNo).FacilityISMError == true) { treeNode.ImageIndex = 1; }
                 if (mainDashboard.GetFacility(facNo).FacilityScriptError == true) { treeNode.ImageIndex = 1; }
                 if (mainDashboard.GetFacility(facNo).FacilityFailMatch == false) { treeNode.ImageIndex = 1; }

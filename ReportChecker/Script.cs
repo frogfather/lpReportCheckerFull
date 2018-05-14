@@ -253,12 +253,30 @@ namespace ReportChecker
          { 
              if (index< 0 || index >= _dashFail.Count) { return ""; } 
              return _dashFail[index]; 
-         } 
- 
- 
- 
- 
-         private bool CompareSuccess()
+         }
+
+
+        public int GetEmailFailCount()
+        {
+            return _emailFail.Count;
+        }
+
+        public int GetEmailSuccessCount()
+        {
+            return _emailSuccess.Count;
+        }
+
+        public int GetDashFailCount()
+        {
+            return _dashFail.Count;
+        }
+
+        public int GetDashSuccessCount()
+        {
+            return _dashSuccess.Count;
+        }
+
+        private bool CompareSuccess()
          { 
              if (_emailSuccess.Count != _dashSuccess.Count) { return false; }     
              foreach(string item in _dashSuccess)
