@@ -105,9 +105,10 @@ namespace ReportChecker
  
                  } 
              } 
-         } 
+         }
+        
 
-         public void AddEmailSuccess(string serviceCode)
+        public void AddEmailSuccess(string serviceCode)
  
  
          {             
@@ -177,11 +178,15 @@ namespace ReportChecker
          } 
  
  
-         public string GetEmailFail(string serviceCode)
+         public string GetEmailFailMessage(string serviceCode)
          { 
              return _emailFail[serviceCode]; 
-         } 
- 
+         }
+
+        public string GetEmailFailCode(int index)
+        {
+            return _emailFail.Keys.ElementAt(index);
+        }
  
          public void AddDashSuccess(string serviceCode)
          { 

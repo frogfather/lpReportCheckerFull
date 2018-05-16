@@ -110,8 +110,8 @@ namespace ReportChecker
                     //process the records depending on whether they're detail, summary or server page
                     if (detail)
                     {                                                                                                                        
-                        string facilityName = GetDataFromColumn(headers, sepResults, "Name");
-                        string scriptName = GetDataFromColumn(headers, sepResults, "Script Name");
+                        string facilityName = GetDataFromColumn(headers, sepResults, "Name").Trim();
+                        string scriptName = GetDataFromColumn(headers, sepResults, "Script Name").Trim();
                         
                         if (GetDataFromColumn(headers, sepResults, "Server")!="")
                         {

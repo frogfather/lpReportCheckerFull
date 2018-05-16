@@ -39,7 +39,7 @@ namespace ReportChecker
              Script testScript = new Script("TestScript"); 
              testScript.AddEmailFail("1234", "Error Message1"); 
              testScript.AddEmailFail("1234", "Error Message2"); 
-             Assert.AreEqual("Error Message1",testScript.GetEmailFail("1234")); 
+             Assert.AreEqual("Error Message1",testScript.GetEmailFailMessage("1234")); 
          } 
  
  
@@ -49,8 +49,8 @@ namespace ReportChecker
              Script testScript = new Script("TestScript"); 
              testScript.AddEmailFail("1234", "Error Message4"); 
              testScript.AddEmailFail("1235", "Error Message2"); 
-             Assert.AreEqual("Error Message4", testScript.GetEmailFail("1234")); 
-             Assert.AreEqual("Error Message2", testScript.GetEmailFail("1235")); 
+             Assert.AreEqual("Error Message4", testScript.GetEmailFailMessage("1234")); 
+             Assert.AreEqual("Error Message2", testScript.GetEmailFailMessage("1235")); 
          } 
 
     }

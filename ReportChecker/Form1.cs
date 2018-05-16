@@ -118,48 +118,79 @@ namespace ReportChecker
             {
                 //generate array of scripts
                 int scriptCount = mainDashboard.GetFacility(facNo).GetScriptCount();
-                TreeNode[] scriptArray = new TreeNode[scriptCount];
-                TreeNode[] resultArray;
+                TreeNode[] scriptArray = new TreeNode[scriptCount];                
                 for (int scriptNo = 0; scriptNo < scriptCount; scriptNo ++)
                 {
                     //for each script we need a list of success email codes, success dash codes, fail email codes, fail dash codes
-                    //we have a node for success and fail if there are any results
-                    int resultTypeCount = 0; 
-                    if (mainDashboard.GetFacility(facNo).GetScript(scriptNo).GetDashSuccessCount() > 0 || mainDashboard.GetFacility(facNo).GetScript(scriptNo).GetEmailSuccessCount() > 0) { resultTypeCount += 1; }
-                    if (mainDashboard.GetFacility(facNo).GetScript(scriptNo).GetDashFailCount() > 0 || mainDashboard.GetFacility(facNo).GetScript(scriptNo).GetEmailFailCount() > 0) { resultTypeCount += 1; }
-                    
-                    if (resultTypeCount > 0)
-                    {
-                        resultArray = new TreeNode[resultTypeCount];
-                        if (mainDashboard.GetFacility(facNo).GetScript(scriptNo).GetEmailSuccessCount() > 0 || mainDashboard.GetFacility(facNo).GetScript(scriptNo).GetDashSuccessCount() > 0)
+                    //we have a node for success and fail if there are any results                    
+                    int dashSuccessCount = mainDashboard.GetFacility(facNo).GetScript(scriptNo).GetDashSuccessCount();
+                    int dashFailCount = mainDashboard.GetFacility(facNo).GetScript(scriptNo).GetDashFailCount();
+                    int emailSuccessCount = mainDashboard.GetFacility(facNo).GetScript(scriptNo).GetEmailSuccessCount();
+                    int emailFailCount = mainDashboard.GetFacility(facNo).GetScript(scriptNo).GetEmailFailCount();
+
+                    scriptArray[scriptNo] = new TreeNode(mainDashboard.GetFacility(facNo).GetScript(scriptNo).Name);
+                    if (dashSuccessCount >0 || emailSuccessCount > 0)
+                    {                       
+                        TreeNode successCodes = new TreeNode("Success codes");
+                        if(dashSuccessCount > 0)
                         {
-                            resultArray[0] = new TreeNode("Success codes");
-                            if (mainDashboard.GetFacility(facNo).GetScript(scriptNo).SuccessCountMatch == false) { resultArray[0].ImageIndex = 1; }
-                            resultArray[0].SelectedImageIndex = resultArray[0].ImageIndex;
-                        }
-                        if (mainDashboard.GetFacility(facNo).GetScript(scriptNo).GetEmailFailCount() > 0 || mainDashboard.GetFacility(facNo).GetScript(scriptNo).GetDashFailCount() > 0)
-                        {
-                            if (resultTypeCount == 2)
+                            TreeNode dashSuccessCodes = new TreeNode("Dashboard");
+                            successCodes.Nodes.Add(dashSuccessCodes);
+                            for(int i = 0; i< dashSuccessCount;i++)
                             {
-                                resultArray[1] = new TreeNode("Fail codes");
-                                if (mainDashboard.GetFacility(facNo).GetScript(scriptNo).FailCountMatch == false) { resultArray[1].ImageIndex = 1; }
-                                resultArray[1].SelectedImageIndex = resultArray[1].ImageIndex;
-                            }
-                            else
-                            {
-                                resultArray[0] = new TreeNode("Fail codes");
-                                if (mainDashboard.GetFacility(facNo).GetScript(scriptNo).FailCountMatch == false) { resultArray[0].ImageIndex = 1; }
+                                dashSuccessCodes.Nodes.Add(mainDashboard.GetFacility(facNo).GetScript(scriptNo).GetDashSuccess(i));
                             }
                         }
+                        if(emailSuccessCount > 0)
+                        {
+                            TreeNode emailSuccessCodes = new TreeNode("Email");
+                            successCodes.Nodes.Add(emailSuccessCodes);
+                            for (int i = 0; i < emailSuccessCount; i++)
+                            {
+                                emailSuccessCodes.Nodes.Add(mainDashboard.GetFacility(facNo).GetScript(scriptNo).GetEmailSuccess(i));
+                            }
+
+                        }
+
+                        if (mainDashboard.GetFacility(facNo).GetScript(scriptNo).SuccessCountMatch == false) { successCodes.ImageIndex = 1;}
+                        successCodes.SelectedImageIndex = successCodes.ImageIndex;
+                        scriptArray[scriptNo].Nodes.Add(successCodes);
 
                     }
-                    else
+                    if (dashFailCount > 0 || emailFailCount > 0)
                     {
-                        resultArray = new TreeNode[1];
-                        resultArray[0] = new TreeNode("No charge codes posted");
+                        TreeNode failCodes = new TreeNode("Fail codes");
+                        if (dashFailCount>0)
+                        {
+                            TreeNode dashFailCodes = new TreeNode("Dashboard");
+                            failCodes.Nodes.Add(dashFailCodes);
+                            for (int i = 0; i < dashFailCount; i++)
+                            {
+                                dashFailCodes.Nodes.Add(mainDashboard.GetFacility(facNo).GetScript(scriptNo).GetDashFail(i));
+                            }
+
+                        }
+                        if (emailFailCount>0)
+                        {
+                            TreeNode emailFailCodes = new TreeNode("Email");
+                            failCodes.Nodes.Add(emailFailCodes);
+                            for (int i = 0; i < emailFailCount; i++)
+                            {
+                                string failCode = mainDashboard.GetFacility(facNo).GetScript(scriptNo).GetEmailFailCode(i);
+                                TreeNode emailFailCode = new TreeNode(failCode);
+                                emailFailCode.Nodes.Add(mainDashboard.GetFacility(facNo).GetScript(scriptNo).GetEmailFailMessage(failCode));
+                                emailFailCodes.Nodes.Add(emailFailCode);
+                            }
+
+                        }
+
+                        if (mainDashboard.GetFacility(facNo).GetScript(scriptNo).FailCountMatch == false) { failCodes.ImageIndex = 1; }
+                        failCodes.SelectedImageIndex = failCodes.ImageIndex;
+                        scriptArray[scriptNo].Nodes.Add(failCodes);
                     }
 
-                    scriptArray[scriptNo] = new TreeNode(mainDashboard.GetFacility(facNo).GetScript(scriptNo).Name,resultArray);                    
+
+
                     if (mainDashboard.GetFacility(facNo).GetScript(scriptNo).ISMError == true) { scriptArray[scriptNo].ImageIndex = 1; }
                     if (mainDashboard.GetFacility(facNo).GetScript(scriptNo).ScriptError == true) { scriptArray[scriptNo].ImageIndex = 1; }
                     if (mainDashboard.GetFacility(facNo).GetScript(scriptNo).FailCountMatch == false) { scriptArray[scriptNo].ImageIndex = 1; }

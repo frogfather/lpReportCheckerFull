@@ -49,7 +49,7 @@
             // 
             // listBox1
             // 
-            this.listBox1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(222)))), ((int)(((byte)(240)))), ((int)(((byte)(255)))));
+            this.listBox1.BackColor = System.Drawing.SystemColors.Window;
             this.listBox1.FormattingEnabled = true;
             this.listBox1.HorizontalScrollbar = true;
             this.listBox1.Location = new System.Drawing.Point(51, 42);
@@ -59,7 +59,7 @@
             // 
             // tvResults
             // 
-            this.tvResults.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(222)))), ((int)(((byte)(240)))), ((int)(((byte)(255)))));
+            this.tvResults.BackColor = System.Drawing.SystemColors.Window;
             this.tvResults.ImageIndex = 0;
             this.tvResults.ImageList = this.ilResults;
             this.tvResults.Location = new System.Drawing.Point(502, 42);
