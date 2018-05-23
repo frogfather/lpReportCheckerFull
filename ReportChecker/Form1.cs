@@ -1,11 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
 using System.Windows.Forms;
 
@@ -18,11 +11,44 @@ namespace ReportChecker
             InitializeComponent();
             mainDashboard = new Dashboard();
             mainDashboard.DashFlagsChanged += ReportDashFlags;
+            tvResults.MouseDown += new MouseEventHandler(tvResults_MouseDown);
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
 
+        }
+
+        void tvResults_MouseDown(object sender, MouseEventArgs e)
+        {
+            TreeNode currentNode = tvResults.GetNodeAt(e.X, e.Y);               
+            if (currentNode != null && currentNode.Parent != null && currentNode.Parent.Parent != null)
+            {
+                if (currentNode.Nodes.Count == 0 && currentNode.Parent.Parent.Text.ToUpper() == "EMAIL")
+                {                    
+                    if (e.Button == System.Windows.Forms.MouseButtons.Right) 
+                    {
+                        //find the item from the tree view
+                        //this will only be called if we're on a failure email error message
+                        //so, head up the tree and we'll find the facility
+                        //CheckMessageIgnoreStatus()
+                        System.Drawing.Point mPos = new System.Drawing.Point();
+                        mPos = Cursor.Position;                        
+                        mnuAlerts.Show(mPos);
+                    }
+                    
+                    
+                }
+            }                            
+        }
+
+        private void hideAlertsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (sender is System.Windows.Forms.ToolStripMenuItem)
+            {
+                System.Windows.Forms.ToolStripMenuItem source = (System.Windows.Forms.ToolStripMenuItem)sender;
+                Console.WriteLine(source.Text);
+            }
         }
 
         private void ReportDashFlags(object sender, MatchEventArgs args)
@@ -109,6 +135,8 @@ namespace ReportChecker
 
             }
         }
+
+        
 
         private void GenerateTreeResults()
         {
@@ -252,15 +280,11 @@ namespace ReportChecker
         private void ReadHTML(string path, string fileName)
         {
             FileReader fr = new FileReader();
-            fr.ReadFile(path + fileName);
+            fr.ReadHTML(path + fileName);
             mainDashboard.ProcessEmails(fr.GetResults(), fr.FacilityName, fr.Success);            
         }
 
         Dashboard mainDashboard;
 
-        private void tvResults_MouseClick(object sender, MouseEventArgs e)
-        {
-            
-        }
     }
 }

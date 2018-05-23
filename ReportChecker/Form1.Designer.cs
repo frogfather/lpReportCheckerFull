@@ -34,6 +34,10 @@
             this.listBox1 = new System.Windows.Forms.ListBox();
             this.tvResults = new System.Windows.Forms.TreeView();
             this.ilResults = new System.Windows.Forms.ImageList(this.components);
+            this.mnuAlerts = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.hideAlertsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.showAlertsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.mnuAlerts.SuspendLayout();
             this.SuspendLayout();
             // 
             // button1
@@ -67,7 +71,6 @@
             this.tvResults.SelectedImageIndex = 0;
             this.tvResults.Size = new System.Drawing.Size(375, 212);
             this.tvResults.TabIndex = 2;
-            this.tvResults.MouseClick += new System.Windows.Forms.MouseEventHandler(this.tvResults_MouseClick);
             // 
             // ilResults
             // 
@@ -75,6 +78,30 @@
             this.ilResults.TransparentColor = System.Drawing.Color.Transparent;
             this.ilResults.Images.SetKeyName(0, "blank.bmp");
             this.ilResults.Images.SetKeyName(1, "alert.bmp");
+            // 
+            // mnuAlerts
+            // 
+            this.mnuAlerts.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.hideAlertsToolStripMenuItem,
+            this.showAlertsToolStripMenuItem});
+            this.mnuAlerts.Name = "mnuAlerts";
+            this.mnuAlerts.Size = new System.Drawing.Size(153, 70);
+            this.mnuAlerts.Text = " Eeek";
+            // 
+            // hideAlertsToolStripMenuItem
+            // 
+            this.hideAlertsToolStripMenuItem.Name = "hideAlertsToolStripMenuItem";
+            this.hideAlertsToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.hideAlertsToolStripMenuItem.Text = "Hide Alerts";
+            this.hideAlertsToolStripMenuItem.Click += new System.EventHandler(this.hideAlertsToolStripMenuItem_Click);
+            // 
+            // showAlertsToolStripMenuItem
+            // 
+            this.showAlertsToolStripMenuItem.Enabled = false;
+            this.showAlertsToolStripMenuItem.Name = "showAlertsToolStripMenuItem";
+            this.showAlertsToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.showAlertsToolStripMenuItem.Text = "Show Alerts";
+            this.showAlertsToolStripMenuItem.Click += new System.EventHandler(this.hideAlertsToolStripMenuItem_Click);
             // 
             // Form1
             // 
@@ -88,6 +115,7 @@
             this.Name = "Form1";
             this.Text = "Report Checker";
             this.Load += new System.EventHandler(this.Form1_Load);
+            this.mnuAlerts.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -97,6 +125,9 @@
         private System.Windows.Forms.ListBox listBox1;
         private System.Windows.Forms.TreeView tvResults;
         private System.Windows.Forms.ImageList ilResults;
+        private System.Windows.Forms.ContextMenuStrip mnuAlerts;
+        private System.Windows.Forms.ToolStripMenuItem hideAlertsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem showAlertsToolStripMenuItem;
     }
 }
 
