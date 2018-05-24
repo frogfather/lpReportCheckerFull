@@ -21,19 +21,25 @@ namespace ReportChecker
 
         void tvResults_MouseDown(object sender, MouseEventArgs e)
         {
-            TreeNode currentNode = tvResults.GetNodeAt(e.X, e.Y);               
+            TreeNode currentNode = tvResults.GetNodeAt(e.X, e.Y);
+            if (currentNode != null)
+            {
+                tvResults.SelectedNode = currentNode;
+            }
+            
             if (currentNode != null && currentNode.Parent != null && currentNode.Parent.Parent != null)
             {
                 if (currentNode.Nodes.Count == 0 && currentNode.Parent.Parent.Text.ToUpper() == "EMAIL")
                 {                    
                     if (e.Button == System.Windows.Forms.MouseButtons.Right) 
                     {
-                        //find the item from the tree view
-                        //this will only be called if we're on a failure email error message
-                        //so, head up the tree and we'll find the facility
-                        //CheckMessageIgnoreStatus()
+                        //need to check if this error message is in the ignored list                                                
+
+                        showAlertsToolStripMenuItem.Enabled = InIgnoredList(currentNode.Text);
+                        hideAlertsToolStripMenuItem.Enabled = !showAlertsToolStripMenuItem.Enabled;
+                        Console.WriteLine("in mouseDown " + Cursor.Position.X + Cursor.Position.Y);
                         System.Drawing.Point mPos = new System.Drawing.Point();
-                        mPos = Cursor.Position;                        
+                        mPos = Cursor.Position;                                            
                         mnuAlerts.Show(mPos);
                     }
                     
@@ -42,12 +48,37 @@ namespace ReportChecker
             }                            
         }
 
+        private void AddToIgnored(string errMessage)
+        {
+
+        }
+
+        private bool InIgnoredList(string errMessage)
+        {
+            return true;
+        }
+
+        private void RemoveFromIgnored(string errMessage)
+        {
+
+        }
+
         private void hideAlertsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (sender is System.Windows.Forms.ToolStripMenuItem)
             {
                 System.Windows.Forms.ToolStripMenuItem source = (System.Windows.Forms.ToolStripMenuItem)sender;
-                Console.WriteLine(source.Text);
+                if (source.Text == "Hide Alerts")
+                {                    
+                    AddToIgnored(tvResults.SelectedNode.Text);
+                    Console.WriteLine(tvResults.SelectedNode.Text + " add to ignored");
+
+                }
+                else
+                {
+                    RemoveFromIgnored(tvResults.SelectedNode.Text);
+                    Console.WriteLine(tvResults.SelectedNode.Text + " removed from ignored");
+                }
             }
         }
 
