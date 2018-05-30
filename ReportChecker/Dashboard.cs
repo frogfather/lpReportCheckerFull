@@ -225,7 +225,7 @@ namespace ReportChecker
             
          public bool FacilityExists(string facilityName)
          { 
-             return facilities.Find(x => x.Name == facilityName) != null; 
+             return facilities.Find(x => x.Name.ToUpper() == facilityName.ToUpper()) != null; 
          } 
  
  
@@ -259,7 +259,7 @@ namespace ReportChecker
             {
                 AddFacility(facilityName);
             }
-             return facilities.Find(x => x.Name == facilityName);     
+             return facilities.Find(x => x.Name.ToUpper() == facilityName.ToUpper());     
          } 
  
         public int GetFacilityCount()
