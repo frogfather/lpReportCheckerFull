@@ -50,16 +50,12 @@ namespace ReportChecker
             }
         }
 
-        public StreamReader GetReader(string filename)
-        {
-            if (!File.Exists(filename)) { return null; }
-            return new StreamReader(filename);
-        }
+       
 
 
         public void ReadHTML(string filename)
         {
-            StreamReader sr = GetReader(filename);
+            StreamReader sr = FileUtilities.GetReader(filename);
             if (sr != null)
             {
                 using (sr)
