@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using Excel = Microsoft.Office.Interop.Excel;
+
 
 
 namespace ReportChecker
@@ -112,7 +111,7 @@ namespace ReportChecker
             GC.WaitForPendingFinalizers();
 
             //release com objects
-            Marshal.ReleaseComObject(xlRange);
+            System.Runtime.InteropServices.Marshal.ReleaseComObject(xlRange);
             Marshal.ReleaseComObject(xlWorksheet);
 
             //close and release

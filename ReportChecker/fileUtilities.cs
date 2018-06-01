@@ -9,7 +9,7 @@ namespace ReportChecker
         public static List<string> ReadFile(string fileName)
         {
             List<string> resultList = new List<string>();
-            StreamReader sr = FileUtilities.GetReader(filename);
+            StreamReader sr = FileUtilities.GetReader(fileName);
             if (sr != null)
             {
                 using (sr)

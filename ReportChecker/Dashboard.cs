@@ -142,7 +142,7 @@ namespace ReportChecker
                                 GetFacility(currentFacilityName).GetScript(scriptName).SuccessCount += Convert.ToInt16(GetDataFromColumn(headers, sepResults, "Success Count"));
                                 GetFacility(currentFacilityName).GetScript(scriptName).FailCount += Convert.ToInt16(GetDataFromColumn(headers, sepResults, "Failure Count"));
                             }
-                            catch (FormatException e)
+                            catch (FormatException)
                             {
                                 //these columns should have a value. if they don't - poss script fail
                                 if (scriptName != "")
