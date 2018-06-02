@@ -6,7 +6,8 @@ namespace ReportChecker
 {
     public class Dashboard
     {
-        
+        private const string IgnoredFile = "C:\\lpReports\\ignored.txt";
+
         public Dashboard()
         {
             facilities = new List<Facility>();
@@ -15,7 +16,38 @@ namespace ReportChecker
             DashFailMatch = true;
             DashSuccessMatch = true;
             DashISMError = false;
+            _ignored = LoadIgnoredList(IgnoredFile);
         }
+
+        private List<string> LoadIgnoredList(string fileName)
+        {
+            return FileUtilities.ReadFile(fileName);
+        }
+
+        public void SaveIgnoredList()
+        {                        
+            FileUtilities.WriteFile(IgnoredFile, _ignored);
+        }
+
+        public void AddToIgnoredList(string errMessage)
+        {
+            if (!InIgnoredList(errMessage))
+            {
+                _ignored.Add(errMessage);
+            }
+        }
+
+        public bool InIgnoredList(string errMessage)
+        {
+            return (_ignored.IndexOf(errMessage) > -1);            
+        }
+
+        public void RemoveFromIgnoredList(string errMessage)
+        {
+            if (!InIgnoredList(errMessage)) { return; }
+            _ignored.RemoveAt(_ignored.IndexOf(errMessage));
+        }
+
 
         private void SetUpEmailToDash()
         {
@@ -27,7 +59,6 @@ namespace ReportChecker
             emailToDash.Add("Danville Regional Medical", "Danville Regional Medical Center");                                                                      
             emailToDash.Add("Vaughan Regional Medical Center", "Vaughan Regional Medical Center Parkway Campus");
         }
-
 
         public void ProcessEmails(List<string> results, string facilityName, bool success)
          {
@@ -223,13 +254,12 @@ namespace ReportChecker
             
         }
             
-         public bool FacilityExists(string facilityName)
+        public bool FacilityExists(string facilityName)
          { 
              return facilities.Find(x => x.Name.ToUpper() == facilityName.ToUpper()) != null; 
          } 
  
- 
-         public void AddFacility(string facilityName)
+        public void AddFacility(string facilityName)
          { 
             if (!FacilityExists(facilityName))
             {
@@ -253,7 +283,7 @@ namespace ReportChecker
             }
         }
  
-         public Facility GetFacility(string facilityName)
+        public Facility GetFacility(string facilityName)
          { 
             if (!FacilityExists(facilityName))
             {
@@ -396,6 +426,7 @@ namespace ReportChecker
         bool _dashSuccMatch;
         bool _dashISMError;
         bool _dashScriptError;
+        List<string> _ignored = new List<string>();
         public event MatchChangedDelegate DashFlagsChanged;
     }
 

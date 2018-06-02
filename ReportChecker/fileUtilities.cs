@@ -24,12 +24,30 @@ namespace ReportChecker
                     return resultList;
         }
 
-        public static StreamReader GetReader(string filename)
+        public static StreamReader GetReader(string fileName)
         {
-            if (!File.Exists(filename)) { return null; }
-            return new StreamReader(filename);
+            if (!File.Exists(fileName)) { return null; }
+            return new StreamReader(fileName);
         }
 
+        public static StreamWriter GetWriter(string fileName)
+        {
+            return new StreamWriter(fileName);
+        }
+
+        public static void WriteFile(string fileName, List<string> dataToWrite)
+        {
+            StreamWriter sw = GetWriter(fileName);
+            using (sw)
+            {
+                if (dataToWrite.Count == 0) { return; }
+                foreach (string line in dataToWrite)
+                {
+                    sw.WriteLine(line);
+                }
+
+            }
+        }
 
         
         

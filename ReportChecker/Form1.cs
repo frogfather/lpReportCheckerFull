@@ -35,7 +35,7 @@ namespace ReportChecker
                     {
                         //need to check if this error message is in the ignored list                                                
 
-                        showAlertsToolStripMenuItem.Enabled = InIgnoredList(currentNode.Text);
+                        showAlertsToolStripMenuItem.Enabled = mainDashboard.InIgnoredList(currentNode.Text);
                         hideAlertsToolStripMenuItem.Enabled = !showAlertsToolStripMenuItem.Enabled;
                         Console.WriteLine("in mouseDown " + Cursor.Position.X + Cursor.Position.Y);
                         System.Drawing.Point mPos = new System.Drawing.Point();
@@ -48,21 +48,7 @@ namespace ReportChecker
             }                            
         }
 
-        private void AddToIgnored(string errMessage)
-        {
-
-        }
-
-        private bool InIgnoredList(string errMessage)
-        {
-            return true;
-        }
-
-        private void RemoveFromIgnored(string errMessage)
-        {
-
-        }
-
+    
         private void hideAlertsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (sender is System.Windows.Forms.ToolStripMenuItem)
@@ -70,14 +56,14 @@ namespace ReportChecker
                 System.Windows.Forms.ToolStripMenuItem source = (System.Windows.Forms.ToolStripMenuItem)sender;
                 if (source.Text == "Hide Alerts")
                 {                    
-                    AddToIgnored(tvResults.SelectedNode.Text);
-                    Console.WriteLine(tvResults.SelectedNode.Text + " add to ignored");
+                    mainDashboard.AddToIgnoredList(tvResults.SelectedNode.Text);
+                    Console.WriteLine(tvResults.SelectedNode.Text + " add to ignored list");
 
                 }
                 else
                 {
-                    RemoveFromIgnored(tvResults.SelectedNode.Text);
-                    Console.WriteLine(tvResults.SelectedNode.Text + " removed from ignored");
+                    mainDashboard.RemoveFromIgnoredList(tvResults.SelectedNode.Text);
+                    Console.WriteLine(tvResults.SelectedNode.Text + " removed from ignored list");
                 }
             }
         }
@@ -317,5 +303,9 @@ namespace ReportChecker
 
         Dashboard mainDashboard;
 
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            mainDashboard.SaveIgnoredList();
+        }
     }
 }

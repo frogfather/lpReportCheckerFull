@@ -85,13 +85,13 @@
             this.hideAlertsToolStripMenuItem,
             this.showAlertsToolStripMenuItem});
             this.mnuAlerts.Name = "mnuAlerts";
-            this.mnuAlerts.Size = new System.Drawing.Size(153, 70);
+            this.mnuAlerts.Size = new System.Drawing.Size(137, 48);
             this.mnuAlerts.Text = " Eeek";
             // 
             // hideAlertsToolStripMenuItem
             // 
             this.hideAlertsToolStripMenuItem.Name = "hideAlertsToolStripMenuItem";
-            this.hideAlertsToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.hideAlertsToolStripMenuItem.Size = new System.Drawing.Size(136, 22);
             this.hideAlertsToolStripMenuItem.Text = "Hide Alerts";
             this.hideAlertsToolStripMenuItem.Click += new System.EventHandler(this.hideAlertsToolStripMenuItem_Click);
             // 
@@ -99,7 +99,7 @@
             // 
             this.showAlertsToolStripMenuItem.Enabled = false;
             this.showAlertsToolStripMenuItem.Name = "showAlertsToolStripMenuItem";
-            this.showAlertsToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.showAlertsToolStripMenuItem.Size = new System.Drawing.Size(136, 22);
             this.showAlertsToolStripMenuItem.Text = "Show Alerts";
             this.showAlertsToolStripMenuItem.Click += new System.EventHandler(this.hideAlertsToolStripMenuItem_Click);
             // 
@@ -114,6 +114,7 @@
             this.Controls.Add(this.button1);
             this.Name = "Form1";
             this.Text = "Report Checker";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
             this.mnuAlerts.ResumeLayout(false);
             this.ResumeLayout(false);
