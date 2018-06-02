@@ -36,7 +36,7 @@ namespace ReportChecker
         }
 
         public static void WriteFile(string fileName, List<string> dataToWrite)
-        {
+        {            
             StreamWriter sw = GetWriter(fileName);
             using (sw)
             {
@@ -49,11 +49,24 @@ namespace ReportChecker
             }
         }
 
-        
-        
-        
-                    
-                    
+        public static void WriteFile(string fileName, Dictionary<string,string> dataToWrite)
+        {
+            StreamWriter sw = GetWriter(fileName);
+            using (sw)
+            {
+                if (dataToWrite.Count == 0) { return; }
+                foreach (KeyValuePair<string,string> kvp in dataToWrite)
+                {
+                    sw.WriteLine(kvp.Key + ',' + kvp.Value);
+                }
+
+            }
+        }
+
+
+
+
+
 
 
     }

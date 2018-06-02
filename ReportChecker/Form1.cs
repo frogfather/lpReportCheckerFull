@@ -81,12 +81,12 @@ namespace ReportChecker
             fileName = OpenFile();
             if (fileName != "")
             {
-                directoryPath = GetDirectoryFromFileName(fileName);
-                //check the date of the selected file
-                fileDate = GetFileDate(fileName);
-                if (fileDate != Convert.ToDateTime("11/11/2222"))
+                directoryPath = GetDirectoryFromFilePath(fileName);
+                //check the date of the selected file. If excel we should get the date from the file name in case it's been generated manually at a later date
+                mainDashboard.DateProcessed = GetFileDate(fileName);                
+                if (mainDashboard.DateProcessed != Convert.ToDateTime("11/11/2222"))
                 {
-                    listBox1.Items.Add("Selected date "+ Convert.ToString(fileDate));
+                    listBox1.Items.Add("Selected date "+ Convert.ToString(mainDashboard.DateProcessed));
                     listBox1.Items.Add(directoryPath);
                     //now iterate through the files in the directory ignoring ones that are different days to the selected file
                     DirectoryInfo dirInfo = new DirectoryInfo(directoryPath);
@@ -95,7 +95,7 @@ namespace ReportChecker
                     foreach(System.IO.FileInfo fileInfo in fileInfoList)
                     {
                         //compare its date to the selected file date. Ignore files that aren't either .html or .xlsx
-                        if (fileInfo.LastWriteTime.Date != fileDate.Date || fileInfo.Attributes.HasFlag(FileAttributes.Hidden)) 
+                        if (fileInfo.LastWriteTime.Date != mainDashboard.DateProcessed.Date || fileInfo.Attributes.HasFlag(FileAttributes.Hidden)) 
                         {
                             //listBox1.Items.Add("File " + fileInfo.Name + " out of date: " + fileInfo.LastWriteTime); maybe move it to an 'old files folder?
                         }
@@ -269,11 +269,12 @@ namespace ReportChecker
 
         }
 
-        private String GetDirectoryFromFileName(string fileName)
+        private String GetDirectoryFromFilePath(string fileName)
         {
             return fileName.Substring(0, fileName.LastIndexOf("\\") + 1);
         }
-        private DateTime GetFileDate(string fileName)
+
+        private DateTime GetFileDate(string fileName) //should get from name if excel?
         {
             if (File.Exists(fileName))
             {
@@ -284,6 +285,7 @@ namespace ReportChecker
                 return Convert.ToDateTime("11/11/2222");
             }
         }
+
         private void ReadExcel(string path, string excelName)
         {
             //this should return a collection of strings that other methods can process
@@ -306,6 +308,7 @@ namespace ReportChecker
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             mainDashboard.SaveIgnoredList();
+            mainDashboard.SavePreviousCloudNumbers();
         }
     }
 }

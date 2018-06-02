@@ -7,6 +7,7 @@ namespace ReportChecker
     public class Dashboard
     {
         private const string IgnoredFile = "C:\\lpReports\\ignored.txt";
+        private const string CloudFile = "C:\\lpReports\\cloud.txt";
 
         public Dashboard()
         {
@@ -17,7 +18,17 @@ namespace ReportChecker
             DashSuccessMatch = true;
             DashISMError = false;
             _ignored = LoadIgnoredList(IgnoredFile);
-        }
+            _previousCloudNumbers = LoadPreviousCloudNumbers(CloudFile);
+
+            //below is for checking
+            //DateTime date1 = new DateTime(2018, 06, 02);
+            //DateTime date2 = new DateTime(2018, 06, 03);
+            //DateProcessed = date2;
+            //FindLastCloudNumbers();
+            //SavePreviousCloudNumbers();
+;        }
+
+        public DateTime DateProcessed { get; set; }
 
         private List<string> LoadIgnoredList(string fileName)
         {
@@ -47,6 +58,59 @@ namespace ReportChecker
             if (!InIgnoredList(errMessage)) { return; }
             _ignored.RemoveAt(_ignored.IndexOf(errMessage));
         }
+
+        private Dictionary<string,string> LoadPreviousCloudNumbers(string fileName)
+        {
+            Dictionary<string, string> dateList = new Dictionary<string, string>();
+            List<string> fileLines = new List<string>();
+            char[] separator = { ','};
+            fileLines = FileUtilities.ReadFile(fileName);
+            foreach(string line in fileLines)
+            {
+               string[] lineParts =  line.Trim().Split(separator);
+               if (lineParts.Length == 2)
+                {
+                    if (lineParts[0].Trim() != "" && lineParts[1].Trim() != "")
+                    {
+                        dateList.Add(lineParts[0].Trim(), lineParts[1].Trim());
+                    }
+                }
+            }
+            return dateList;
+        }
+
+        public void SavePreviousCloudNumbers()
+        {
+            FileUtilities.WriteFile(CloudFile, _previousCloudNumbers);
+        }
+
+        public void AddToPreviousCloudNumbers(string date, string count)
+        {
+            if (!_previousCloudNumbers.ContainsKey(date))
+            {
+                _previousCloudNumbers.Add(date, count);
+            }
+        }
+
+        public bool RemoveFromPreviousCloudNumbers(string date)
+        {
+            return _previousCloudNumbers.Remove(date);
+        }
+
+        public int FindLastCloudNumbers()
+        {
+            string dayBefore = String.Format("{0:dd/MM/yyyy}" ,DateProcessed.AddDays(-1));
+            
+            string cloudCount;
+            //find the date before the date we're checking           
+            if (_previousCloudNumbers.ContainsKey(dayBefore))
+            {               
+                cloudCount = _previousCloudNumbers[dayBefore];
+                return Convert.ToInt32(cloudCount);
+            }
+            return -1;
+        }
+
 
 
         private void SetUpEmailToDash()
@@ -134,7 +198,7 @@ namespace ReportChecker
                 {
                     headers = item.Split(parameters, StringSplitOptions.None);
                     detail = sepResults[0] == "Detail";
-                    summary = sepResults[0] == "Detail";
+                    summary = sepResults[0] == "Detail"; //put correct value here
                 }
                 else
                 {
@@ -426,7 +490,9 @@ namespace ReportChecker
         bool _dashSuccMatch;
         bool _dashISMError;
         bool _dashScriptError;
+        
         List<string> _ignored = new List<string>();
+        Dictionary<string, string> _previousCloudNumbers = new Dictionary<string, string>();
         public event MatchChangedDelegate DashFlagsChanged;
     }
 
