@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Collections.Generic;
 
 namespace ReportChecker
@@ -63,8 +64,23 @@ namespace ReportChecker
             }
         }
 
+        public static string GetDirectoryFromFilePath(string fileName)
+        {
+            return fileName.Substring(0, fileName.LastIndexOf("\\") + 1);
+        }
 
 
+        public static DateTime GetFileDate(string fileName) //should get from name if excel in case generated manually?
+        {
+            if (File.Exists(fileName))
+            {
+                return File.GetLastWriteTime(fileName);
+            }
+            else
+            {
+                return Convert.ToDateTime("11/11/2222");
+            }
+        }
 
 
 

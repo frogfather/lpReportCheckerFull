@@ -1,19 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ReportChecker
 {
     public class Facility
     {
-        public Facility(string facName)
+        public Facility(string facName, Dashboard dash)
         {
             Name = facName;
             RecCount = 0;
             SuccessCount = 0;
             FailCount = 0;
+            Dash = dash;
             scripts = new List<Script>();
         }
 
@@ -22,7 +20,7 @@ namespace ReportChecker
         {
             bool overallSuccessMatch = true;
             bool overallFailMatch = true;
-            bool overallISMError = false;
+            bool overallEmailError = false;
             bool overallScriptError = false;
             
             foreach (Script script in scripts)
@@ -30,18 +28,18 @@ namespace ReportChecker
                 //if any facility has a mismatch or ISM error then the flag for this facility is set
                 if (script.FailCountMatch == false) { overallFailMatch = false; }
                 if (script.SuccessCountMatch == false) { overallSuccessMatch = false; }
-                if (script.ISMError == true) { overallISMError = true; }
+                if (script.EmailError == true) { overallEmailError = true; }
                 if (script.ScriptError == true) { overallScriptError = true; }
             }
-
+            
             FacilityFailMatch = overallFailMatch;
             FacilitySuccessMatch = overallSuccessMatch;
-            FacilityISMError = overallISMError;
+            FacilityISMError = overallEmailError;
             FacilityScriptError = overallScriptError;
             
             Console.WriteLine("Script " + args.CalledBy + " Facility success: " + overallSuccessMatch);
             Console.WriteLine("Script " + args.CalledBy + " Facility fail: " + overallFailMatch);
-            Console.WriteLine("Script " + args.CalledBy + " ISM error: " + overallISMError);
+            Console.WriteLine("Script " + args.CalledBy + " Email error: " + overallEmailError);
             Console.WriteLine("Script " + args.CalledBy + " Script error: " + overallScriptError);
         }
 
@@ -49,7 +47,7 @@ namespace ReportChecker
         {
             if (!ScriptExists(scriptName))
             {
-                scripts.Add(new Script(scriptName));
+                scripts.Add(new Script(scriptName,Dash));
                 GetScript(scriptName).MatchChanged += ReportFailChange;
             }
         }
@@ -185,13 +183,14 @@ namespace ReportChecker
             }
         }
 
+        public Dashboard Dash { get => _dash; set => _dash = value; }
 
         List<Script> scripts;
         bool _facFailMatch;
         bool _facSuccMatch;
         bool _facISMMatch;
         bool _facScriptError;
-
+        Dashboard _dash;
         public event MatchChangedDelegate FacFlagsChanged;
     }
 }

@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ReportChecker
 {
     public class Script
     {
 
-        public Script(string scriptName)
+        public Script(string scriptName, Dashboard dash)
         {
             Name = scriptName;
             _dashSuccess = new List<string>();
@@ -17,7 +15,7 @@ namespace ReportChecker
             _emailSuccess = new List<string>();
             _emailFail = new Dictionary<string, string>();
             ScriptError = false;
-            ISMError = false;
+            EmailError = false;
             SuccessCountMatch = true;
             FailCountMatch = true;
         }
@@ -26,7 +24,7 @@ namespace ReportChecker
         public int FacId { get; set; }
         public string ScriptStart { get; set; }
         public string ScriptEnd { get; set; }
-        public bool ISMError { get; set; }
+        public bool EmailError { get; set; }
         public bool SuccessCountMatch { get; set; }
         public bool FailCountMatch { get; set; }
         public bool ScriptError { get; set; }
@@ -137,13 +135,9 @@ namespace ReportChecker
          } 
  
  
-         public string GetEmailSuccess(int index)
- 
- 
+         public string GetEmailSuccess(int index) 
          { 
              if (index< 0 || index >= _emailSuccess.Count) { return ""; } 
- 
- 
              return _emailSuccess[index]; 
          } 
  
@@ -163,7 +157,7 @@ namespace ReportChecker
  
                  _emailFail[serviceCode] = errorMsg;     
                  FailCountMatch = CompareFail(); 
-                 SetISMErrorFlag(errorMsg);
+                 SetEmailErrorFlag(errorMsg);
 
 
                 MatchEventArgs eArgs = new MatchEventArgs()
@@ -305,14 +299,15 @@ namespace ReportChecker
         }
  
  
-         private void SetISMErrorFlag(string errorMsg)
-         { 
-             ISMError |= errorMsg.Contains("ISM");
-             if (ISMError) 
+         private void SetEmailErrorFlag(string errorMsg)
+         {                         
+           
+             EmailError |= errorMsg.Contains("ISM");
+             if (EmailError) 
              { 
                  MatchEventArgs eArgs = new MatchEventArgs()
                  { 
-                     Value = ISMError, 
+                     Value = EmailError, 
                      CalledBy = "ISM Error" 
                  }; 
                  MatchChanged?.Invoke(this, eArgs); 

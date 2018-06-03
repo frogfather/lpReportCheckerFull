@@ -47,7 +47,6 @@ namespace ReportChecker
                 }
             }                            
         }
-
     
         private void hideAlertsToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -72,22 +71,32 @@ namespace ReportChecker
         {
         }
 
+        /// <summary>
+        /// Opens a file dialog and allows user to pick file
+        /// Extracts date from the file
+        /// For each file in the directory it checks if the file date is the same as the selected one
+        /// If .xlsx it reads the dashboard
+        /// If .html it reads the email
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void button1_Click(object sender, EventArgs e)
         {
             string fileName;
             string directoryPath;
-            DateTime fileDate;
+            //remove all facilities too!
             listBox1.Items.Clear();
             fileName = OpenFile();
             if (fileName != "")
             {
-                directoryPath = GetDirectoryFromFilePath(fileName);
+                directoryPath = FileUtilities.GetDirectoryFromFilePath(fileName);
                 //check the date of the selected file. If excel we should get the date from the file name in case it's been generated manually at a later date
-                mainDashboard.DateProcessed = GetFileDate(fileName);                
+                mainDashboard.DateProcessed = FileUtilities.GetFileDate(fileName);                
                 if (mainDashboard.DateProcessed != Convert.ToDateTime("11/11/2222"))
                 {
                     listBox1.Items.Add("Selected date "+ Convert.ToString(mainDashboard.DateProcessed));
                     listBox1.Items.Add(directoryPath);
+                    listBox1.Items.Add("Yesterday's cloud count was: " + ListPrevCloudCount());
                     //now iterate through the files in the directory ignoring ones that are different days to the selected file
                     DirectoryInfo dirInfo = new DirectoryInfo(directoryPath);
                     System.IO.FileInfo[] fileInfoList = dirInfo.GetFiles("*.*");
@@ -119,7 +128,7 @@ namespace ReportChecker
 
                     CheckAllFlags();
                     GenerateTreeResults();
-
+                    ListFacilityTotals();
                 }                
 
             }
@@ -152,9 +161,7 @@ namespace ReportChecker
 
             }
         }
-
         
-
         private void GenerateTreeResults()
         {
             tvResults.Nodes.Clear();
@@ -236,7 +243,7 @@ namespace ReportChecker
 
 
 
-                    if (mainDashboard.GetFacility(facNo).GetScript(scriptNo).ISMError == true) { scriptArray[scriptNo].ImageIndex = 1; }
+                    if (mainDashboard.GetFacility(facNo).GetScript(scriptNo).EmailError == true) { scriptArray[scriptNo].ImageIndex = 1; }
                     if (mainDashboard.GetFacility(facNo).GetScript(scriptNo).ScriptError == true) { scriptArray[scriptNo].ImageIndex = 1; }
                     if (mainDashboard.GetFacility(facNo).GetScript(scriptNo).FailCountMatch == false) { scriptArray[scriptNo].ImageIndex = 1; }
                     if (mainDashboard.GetFacility(facNo).GetScript(scriptNo).SuccessCountMatch == false) { scriptArray[scriptNo].ImageIndex = 1; }
@@ -269,23 +276,6 @@ namespace ReportChecker
 
         }
 
-        private String GetDirectoryFromFilePath(string fileName)
-        {
-            return fileName.Substring(0, fileName.LastIndexOf("\\") + 1);
-        }
-
-        private DateTime GetFileDate(string fileName) //should get from name if excel?
-        {
-            if (File.Exists(fileName))
-            {
-                return File.GetLastWriteTime(fileName);
-            }
-            else
-            {
-                return Convert.ToDateTime("11/11/2222");
-            }
-        }
-
         private void ReadExcel(string path, string excelName)
         {
             //this should return a collection of strings that other methods can process
@@ -303,12 +293,34 @@ namespace ReportChecker
             mainDashboard.ProcessEmails(fr.GetResults(), fr.FacilityName, fr.Success);            
         }
 
-        Dashboard mainDashboard;
+        private void ListFacilityTotals()
+        {
+            Facility fac;            
+            string successCount;
+            string failCount;
+            int facCount = mainDashboard.GetFacilityCount(); 
+            for (int facNo = 0; facNo < facCount; facNo++)
+            {
+                fac = mainDashboard.GetFacility(facNo);                
+                successCount = Convert.ToString(fac.SuccessCount);
+                failCount = Convert.ToString(fac.FailCount);               
+                listBox1.Items.Add("Facility: "+fac.Name+", Success: "+successCount+", Failure: "+failCount);
+            }
+        }
+
+        private string ListPrevCloudCount()
+        {
+            int prevCount = mainDashboard.FindLastCloudNumbers();
+            if (prevCount == -1) { return ""; }
+            return Convert.ToString(prevCount);
+        }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             mainDashboard.SaveIgnoredList();
             mainDashboard.SavePreviousCloudNumbers();
         }
+
+        Dashboard mainDashboard;
     }
 }

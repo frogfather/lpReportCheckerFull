@@ -19,13 +19,6 @@ namespace ReportChecker
             DashISMError = false;
             _ignored = LoadIgnoredList(IgnoredFile);
             _previousCloudNumbers = LoadPreviousCloudNumbers(CloudFile);
-
-            //below is for checking
-            //DateTime date1 = new DateTime(2018, 06, 02);
-            //DateTime date2 = new DateTime(2018, 06, 03);
-            //DateProcessed = date2;
-            //FindLastCloudNumbers();
-            //SavePreviousCloudNumbers();
 ;        }
 
         public DateTime DateProcessed { get; set; }
@@ -327,7 +320,7 @@ namespace ReportChecker
          { 
             if (!FacilityExists(facilityName))
             {
-                facilities.Add(new Facility(facilityName));
+                facilities.Add(new Facility(facilityName, this));
                 Console.WriteLine("Adding facility " + facilityName);
                 Console.WriteLine("Facility count is now " + GetFacilityCount());
                 GetFacility(facilityName).FacFlagsChanged += ReportFacFlagsChanged;
